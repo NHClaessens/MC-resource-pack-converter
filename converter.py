@@ -66,17 +66,18 @@ def convert_files(files):
 
       dest_file.write_text(json.dumps(result, indent=1))
 
+      if not dest_file.exists():
+          print("Could not create new files")
+          return -1
+
 def update_pack_format(file_path: Path):
-    # Read the existing JSON data from the file
     with open(file_path, "r") as file:
         data = json.load(file)
     
     # Check if 'pack' and 'pack_format' are in the JSON data
     if "pack" in data and "pack_format" in data["pack"]:
-        # Update the pack_format to 46
         data["pack"]["pack_format"] = 46
         
-        # Write the modified data back to the file
         with open(file_path, "w") as file:
             json.dump(data, file, indent=4)
         print(f"Updated pack_format to 46 in {file_path}")
@@ -98,6 +99,11 @@ def main():
         return -1
 
     files = get_json_files(path + "/assets/minecraft/models/item")
+
+    if(len(files) == 0):
+      print("This pack does not seem to contain any files")
+      return -1
+    
     convert_files(files)
     update_pack_format(Path(path+"/pack.mcmeta"))
 
